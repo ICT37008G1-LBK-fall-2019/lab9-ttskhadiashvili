@@ -1,0 +1,20 @@
+table {
+    width: calc(50% - 5px);
+    float: left;
+    border-collapse: collapse;
+}
+
+table.post-comments {
+    position: absolute;
+    margin-left: 10px;
+}
+
+tr.active {
+    position: relative;
+    background-color: #6ab04c;
+}
+
+td {
+    border: 1px solid #130f40; 
+    padding: 10px;
+}

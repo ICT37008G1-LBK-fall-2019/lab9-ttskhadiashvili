@@ -1,19 +1,94 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-"use strict";
+//n1
+let userForm = document.querySelector("#user-search");
+userForm.onsubmit = (event) => submitHandler(event);
 
-var axios = require('axios'); //მაგალითები
+function submitHandler(event) {
+  event.preventDefault();
+
+  let enteredId = event.target.querySelector("#user-id").value;
+  let userPosts = document.querySelector("#user-posts");
+  userPosts.innerHTML = "";
+
+  fetch(`https://jsonplaceholder.typicode.com/posts?userId=${enteredId}`)
+  .then(response => response.json())
+  .then(json => json.map(post => {
+    let title = document.createElement("td");
+    title.innerHTML = post.title;  
+
+    let content = document.createElement("td");
+    content.innerHTML = post.body; 
+ 
+    let button = document.createElement("button");
+    button.innerHTML = "Show comments";
+    let postId = document.createAttribute("data-post-id");
+    postId.value = post.id;
+    button.setAttributeNode(postId);
+    button.onclick = (event) => showComments(event)
+
+    let commentsBtn = document.createElement("td");
+    commentsBtn.appendChild(button);
+
+    let row = document.createElement("tr");
+    row.appendChild(title);
+    row.appendChild(content);
+    row.appendChild(commentsBtn);
+    userPosts.appendChild(row);
+  }))
+} 
 
 
-fetch('https://jsonplaceholder.typicode.com/todos/1').then(function (response) {
-  return response.json();
-}).then(function (json) {
-  return console.log(json);
-});
-axios.get('https://jsonplaceholder.typicode.com/todos/1').then(function (response) {
-  console.log(response.data);
-}).catch(function (error) {
-  console.log(error);
-});
+//n2
+const axios = require('axios');
+
+function showComments(event) {
+  let postId = event.target.getAttribute("data-post-id");
+  let postsTeble = event.target.closest("table");
+
+  let active = postsTeble.querySelector(".active");
+
+  if (active) {
+    active.classList.remove("active");
+    let commentsTable = document.querySelector(".post-comments");
+    active.removeChild(commentsTable);
+  }
+
+  let currentPost = event.target.closest("tr");
+  currentPost.classList.add("active");
+
+  let commentsTable = document.createElement("table");
+  commentsTable.classList.add("post-comments");
+  currentPost.appendChild(commentsTable);
+  let postComments = document.querySelector(".post-comments")
+  
+  axios.get(`https://jsonplaceholder.typicode.com/comments?postId=${postId}`)
+  .then(response => response.data.map(
+    item => {
+      let name = document.createElement("td");
+      let email = document.createElement("td"); 
+      let comment = document.createElement("td"); 
+  
+      name.innerHTML = item.name;  
+      email.innerHTML = item.email; 
+      comment.innerHTML = item.body; 
+
+      let row = document.createElement("tr");
+      row.appendChild(name);
+      row.appendChild(email);
+      row.appendChild(comment);
+
+      postComments.appendChild(row);
+    }
+  ))
+  .catch(function (error) {
+    console.log(error);
+    alert("Something went wrong")
+  });
+}
+
+
+
+
 
 },{"axios":2}],2:[function(require,module,exports){
 module.exports = require('./lib/axios');
